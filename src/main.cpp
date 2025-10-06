@@ -125,6 +125,8 @@ int main()
     glm::vec3 cameraDirection = glm::normalize(cameraTarget - cameraPos );
     glm::vec3 cameraRight = glm::normalize(glm::cross(cameraDirection, up));
     glm::vec3 cameraUp = glm::cross(cameraRight, cameraDirection);
+    glm::vec3 lightColour = glm::vec3(0.0f, 1.0f, 1.0f); // สีฟ้า (cyan)
+
     /*
     glm::mat4 cameraPosMat (1.0f);
     cameraPosMat[3][0] = -cameraPos.x;
@@ -253,22 +255,26 @@ int main()
         view = glm::lookAt(cameraPos, cameraPos + cameraDiection, cameraUp);
         */
         //Object
-        for (int i = 0; i < 10; i++){
-            glm::mat4 model (1.0f);
+        for (int i = 0; i < 10; i++) {
+            glm::mat4 model(1.0f);
+            model = glm::translate(model, pyramidPositions[i]);
+            model = glm::scale(model, glm::vec3(0.8f, 0.8f, 1.0f));
 
-        model = glm::translate(model, pyramidPositions[i]);
-        model = glm::scale(model, glm::vec3(0.8f, 0.8f, 1.0f));
-        glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-        glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
-        glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(view));
+            glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+            glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
+            glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(view));
 
-        GLuint uniformTexture1 = shaderList[0]->GetUniformLocation("Texture1");
-        glUniform1i(uniformTexture1, 0);
-        
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D,texture1);
-        meshList[i]->RenderMesh();
+            // 💡 ส่งค่าสีแสงเข้าไปใน shader
+            glUniform3fv(shaderList[0]->GetUniformLocation("lightColour"), 1, glm::value_ptr(lightColour));
+
+            GLuint uniformTexture1 = shaderList[0]->GetUniformLocation("Texture1");
+            glUniform1i(uniformTexture1, 0);
+
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, texture1);
+            meshList[i]->RenderMesh();
         }
+
 
         glUseProgram(0);
         //end draw

@@ -1,11 +1,18 @@
 #version 330 core
 
+in vec4 vCol;
 in vec2 TexCoord;
-out vec4 color;
+out vec4 colour;
 
-uniform sampler2D Texture1;
+uniform vec3 lightColour;
+uniform sampler2D texture2D;
 
 void main()
 {
-    color = texture(Texture1, TexCoord);
+    // แสงรอบ ๆ (Ambient Light)
+    float ambientStrength = 0.3f;   // 30%
+    vec3 ambient = ambientStrength * lightColour;
+
+    // คำนวณสีสุดท้าย = สี texture * สีแสง
+    colour = texture(texture2D, TexCoord) * vec4(ambient, 1.0);
 }
